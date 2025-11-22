@@ -22,7 +22,7 @@ def ban_user(message):
             bot.reply_to(message, f"Пользователь @{message.reply_to_message.from_user.username} был забанен.")
     else:
         bot.reply_to(message, "Эта команда должна быть использована в ответ на сообщение пользователя, которого вы хотите забанить.")
- 
+ #Бан за ссылки
 @bot.message_handler(func=lambda message: True)
 def check_messages(message):
     chat_id = message.chat.id
@@ -37,4 +37,16 @@ def check_messages(message):
     if message.text and ("https://" in message.text or "http://" in message.text):
         bot.ban_chat_member(chat_id, user_id)
         bot.reply_to(message, f"Пользователь @{message.from_user.username} был забанен за отправку ссылки.")
+#Бан за голосовое сообщение
+@bot.message_handler(content_types=['voice'])
+def ban_voice_messages(message):
+    chat_id = message.chat.id
+    user_id = message.from_user.id
+    user_status = bot.get_chat_member(chat_id, user_id).status
+    
+    if user_status not in ['administrator', 'creator']:
+        bot.ban_chat_member(chat_id, user_id)
+        bot.reply_to(message, f"Пользователь @{message.from_user.username} был забанен за отправку голосового сообщения.")
+
+
 bot.infinity_polling(none_stop=True)
